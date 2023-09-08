@@ -9,18 +9,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     environment:
-      name: Configure DockerHub  # 与 GitHub 中设置的环境名相同
+      name: Configure DockerHub
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Set up environment variables
+      run: echo "ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag tomwu618/ip-sonar:$(date +%s)
 
     - name: Login to Docker Hub
-      run: echo "${{ env.ACCESS_TOKEN }}" | docker login -u tomwu618 --password-stdin  # 注意这里使用了 env 而不是 secrets
+      run: echo "${{ env.ACCESS_TOKEN }}" | docker login -u tomwu618 --password-stdin
 
     - name: Push Docker image
       run: docker push tomwu618/ip-sonar
