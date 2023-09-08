@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 	"net"
@@ -12,6 +13,7 @@ func main() {
 	log.Print("v0.0.1")
 
 	http.HandleFunc("/", ExampleHandler)
+	http.HandleFunc("/info", InfoHandler)
 	if err := http.ListenAndServe(":80", nil); err != nil {
 		panic(err)
 	}
@@ -23,6 +25,34 @@ func ExampleHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print(ip)
 
 	w.Write([]byte(ip))
+}
+
+func InfoHandler(w http.ResponseWriter, r *http.Request) {
+	info := make(map[string]interface{})
+
+	// 获取所有参数
+	params := r.URL.Query()
+	for k, v := range params {
+		info[k] = v[0]
+	}
+
+	// 获取所有头信息
+	headers := make(map[string]string)
+	for k, v := range r.Header {
+		headers[k] = v[0]
+	}
+	info["headers"] = headers
+
+	// 将信息转化为JSON格式
+	jsonData, err := json.Marshal(info)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// 设置响应头并返回JSON数据
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 func GetIP(r *http.Request) (string, error) {
