@@ -20,7 +20,7 @@ jobs:
       run: echo "ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag tomwu618/ip-sonar:$(date +%s)
+      run: docker build . --file Dockerfile --tag tomwu618/ip-sonar
 
     - name: Login to Docker Hub
       run: echo "${{ env.ACCESS_TOKEN }}" | docker login -u tomwu618 --password-stdin
